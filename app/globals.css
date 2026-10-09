@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-cream text-ink antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display font-medium;
+  }
+  ::selection {
+    @apply bg-maroon text-cream-card;
+  }
+  :focus-visible {
+    outline: 3px solid theme("colors.gold");
+    outline-offset: 4px;
+  }
+}
+@layer components {
+  .section-wrap {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  }
+  .section-title {
+    @apply text-4xl leading-[1.08] sm:text-5xl lg:text-6xl;
+  }
+  .primary-button {
+    @apply inline-flex min-h-14 items-center justify-center rounded-full bg-maroon px-8 py-4 text-center text-sm font-semibold text-cream-card transition-colors hover:bg-maroon-dark disabled:cursor-wait disabled:opacity-60;
+  }
+  .form-input {
+    @apply w-full rounded-xl border border-maroon/20 bg-cream-card px-4 py-3.5 text-base text-ink outline-none transition focus:border-maroon focus:ring-2 focus:ring-maroon/10;
+  }
+}
+.hero-glow {
+  background: radial-gradient(
+    ellipse at 50% 36%,
+    theme("colors.cream.card") 0%,
+    transparent 65%
+  );
+}
+.hero-entrance {
+  animation: arrive 900ms ease-out both;
+}
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
