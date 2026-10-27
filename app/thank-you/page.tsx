@@ -1,15 +1,8 @@
 import Header from "@/components/Header";
+import ReceiptConfirmation from "@/components/ReceiptConfirmation";
 import { MessageCircle, Play } from "lucide-react";
 import { vimeoEmbed, whatsappLink } from "@/lib/integrations";
-export default async function ThankYou({
-  searchParams,
-}: {
-  searchParams: Promise<{ name?: string; demo?: string }>;
-}) {
-  const params = await searchParams;
-  const name =
-    typeof params.name === "string" ? params.name.trim().slice(0, 60) : "";
-  const demo = params.demo === "1";
+export default function ThankYou() {
   const video = vimeoEmbed(process.env.NEXT_PUBLIC_VIMEO_URL);
   const whatsapp = whatsappLink(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER);
   return (
@@ -21,23 +14,9 @@ export default async function ThankYou({
             ✧
           </span>
           <h1 className="mt-5 font-display text-6xl text-maroon sm:text-7xl">
-            Thank You{name ? `, ${name}` : ""}!
+            Thank You!
           </h1>
-          {demo ? (
-            <>
-              <p className="mt-6 text-xl">
-                Your consultation request has been received in this demo.
-              </p>
-              <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-ink/70">
-                This is a simulated confirmation. No request was sent or saved,
-                and no team follow-up is scheduled.
-              </p>
-            </>
-          ) : (
-            <p className="mx-auto mt-6 max-w-xl text-lg leading-8">
-              No consultation request has been submitted on this page.
-            </p>
-          )}
+          <ReceiptConfirmation />
           <div className="mt-10 overflow-hidden rounded-2xl">
             {video ? (
               <iframe

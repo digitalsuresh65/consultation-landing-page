@@ -24,19 +24,11 @@ Add these to `.env.local`, or to the project's Vercel environment variables:
 
 Blank or invalid configuration renders clearly labeled dashed placeholders. No fake number or video is included. Restart development or rebuild/redeploy after changing environment variables. Public-prefixed variables are public: do not put secrets in them.
 
-## Demo submission and real backend
+## Flodesk submission
 
-The form validates required fields, email, WhatsApp format, and an optional HTTP(S) URL, then simulates a delay and redirects to `/thank-you?demo=1&name=...`. It sends and saves **no form data**. Only a first name is placed in the URL for personalization; it may appear in browser history. The form and demo confirmation explicitly disclose this. Visiting `/thank-you` directly does not claim a request was received.
+The consultation form submits to Flodesk form `6ae077d675c737372cf4391c` using Flodesk's official universal form handler. The existing page design is retained while the input names map to the Flodesk subscriber and custom fields from the supplied embed. Successful submissions use the redirect configured in Flodesk (`/thank-you`), which displays the production receipt message. A hidden `confirm_email_address` honeypot is included for bot filtering.
 
-The demo modifies the provided confirmation wording to prevent implying receipt by the boutique or promising a follow-up that cannot occur. The real-receipt component in `components/ReceiptConfirmation.tsx` contains the exact requested production copy and is deliberately not used until receipt can be verified.
-
-To connect a backend:
-
-1. Replace the commented simulated delay in `components/CTAForm.tsx` with a POST to your real API (for example an App Router `app/api/consultations/route.ts`). Never expose API credentials in client code.
-2. Validate on the server as well as the client; add rate limiting and suitable abuse protection. Save or deliver the request successfully before returning success.
-3. On errors, show an inline status message, reset the loading state, and retain the values for retry. Only redirect after a successful response.
-4. Have the API issue a signed, short-lived receipt or an opaque receipt ID, and verify it server-side on the Thank You page. Do not trust a query parameter such as `success=1` as proof of receipt. Render `ReceiptConfirmation` only for a verified receipt, using its submitted first name for the headline. Remove the demo notice once actual receipt is implemented.
-5. Personal data should be handled under your published privacy policy before accepting real submissions.
+The browser validates full name, email, WhatsApp number, business name, website/Facebook URL, and message before submission. Flodesk owns subscriber creation, segment assignment, workflow enrollment, delivery, duplicate handling, and any confirmation behavior configured for this form. If those settings change, export the updated Flodesk embed and keep its form ID, field keys, and encoded configuration in sync with `components/CTAForm.tsx`.
 
 ## Vercel deployment
 
@@ -51,6 +43,6 @@ Semantic headings and lists, visible keyboard focus, field labels, inline error 
 
 ## Browser QA
 
-`scripts/qa.cjs` checks both pages at 320, 375, 390, and 430 pixels, required-field and format errors, error focus, successful demo redirect, personalization, and empty integration placeholders. Run a local server on port 3000 and execute with an installed Playwright package (`PLAYWRIGHT_MODULE=/absolute/path/to/playwright node scripts/qa.cjs`). It uses an installed Google Chrome browser; Playwright is a QA-only dependency and is not shipped with the site. Synthetic contact values exist only in this local test script.
+`scripts/qa.cjs` checks both pages at 320, 375, 390, and 430 pixels, required-field and format errors, error focus, the exact Flodesk endpoint and field mapping, the thank-you receipt, and empty integration placeholders. Run a local server on port 3000 and execute with an installed Playwright package (`PLAYWRIGHT_MODULE=/absolute/path/to/playwright node scripts/qa.cjs`). It uses an installed Google Chrome browser; Playwright is a QA-only dependency and is not shipped with the site. The QA script intentionally never submits valid contact data, so it cannot create a real Flodesk subscriber or trigger the live workflow.
 
 The production dependency audit is clean. Tailwind 3's development dependency tree currently reports upstream parser/glob advisories; avoid processing untrusted CSS or glob patterns. These packages are build tools and are not part of the deployed browser runtime.

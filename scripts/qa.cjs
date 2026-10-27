@@ -7,7 +7,7 @@ const assert = require("node:assert/strict");
   page.setDefaultNavigationTimeout(120000);
   for (const width of [320, 375, 390, 430]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const route of ["/", "/thank-you?demo=1&name=Pratikshya"]) {
+    for (const route of ["/", "/thank-you"]) {
       await page.goto("http://127.0.0.1:3000" + route);
       await page.evaluate(() => document.fonts.ready);
       assert(
@@ -42,15 +42,38 @@ const assert = require("node:assert/strict");
       exact: true,
     })
     .waitFor();
-  await page.getByLabel("Active Email").fill("test@example.com");
-  await page.getByLabel("WhatsApp Number").fill("+977 9800000000");
+
+  const form = page.locator('form[data-ff-el="form"]');
+  assert.equal(
+    await form.getAttribute("action"),
+    "https://form.flodesk.com/forms/6ae077d675c737372cf4391c/submit",
+  );
+  assert.equal(await form.getAttribute("method"), "post");
+  assert.deepEqual(
+    await form.locator("input, textarea").evaluateAll((elements) =>
+      elements.map((element) => element.getAttribute("name")),
+    ),
+    [
+      "firstName",
+      "email",
+      "fields.whatsappNumber",
+      "fields.businessName",
+      "fields.websieOrFacebookLink",
+      "fields.askAnythinkYouWantToSay",
+      "confirm_email_address",
+    ],
+  );
+  assert.equal(
+    await page.locator('script[data-flodesk-universal="module"]').count(),
+    1,
+  );
+
+  // Do not submit valid synthetic contact data: that would create a real
+  // Flodesk subscriber and could activate the live email workflow.
+  await page.goto("http://127.0.0.1:3000/thank-you");
+  await page.getByRole("heading", { name: "Thank You!" }).waitFor();
   await page
-    .getByRole("button", { name: "Book Free Consultation", exact: true })
-    .click();
-  await page.waitForURL("**/thank-you?**");
-  await page.getByRole("heading", { name: "Thank You, Pratikshya!" }).waitFor();
-  await page
-    .getByText("This is a simulated confirmation.", { exact: false })
+    .getByText("Your consultation request has been received.", { exact: true })
     .waitFor();
   await page
     .getByText("Video will appear here once a Vimeo URL is added")
@@ -58,12 +81,8 @@ const assert = require("node:assert/strict");
   assert.equal(await page.locator("iframe").count(), 0);
   assert.equal(await page.locator('a[href*="wa.me"]').count(), 0);
   console.log(
-    "PASS validation, focus, redirect, personalization, honest demo receipt, integration placeholders",
+    "PASS validation, focus, Flodesk wiring, receipt, and integration placeholders",
   );
-  await page.goto("http://127.0.0.1:3000/thank-you");
-  await page
-    .getByText("No consultation request has been submitted on this page.")
-    .waitFor();
   await page.goto("http://127.0.0.1:3000");
   await page.setViewportSize({ width: 1440, height: 1100 });
   await page.screenshot({ path: "/tmp/aa-desktop.png", fullPage: true });

@@ -32,6 +32,10 @@ export function validate(values: FormValues) {
       errors.url =
         "Please enter a valid URL starting with https:// or http://.";
     }
+  } else {
+    errors.url = "Please enter your website or Facebook URL.";
   }
+  if (!values.message.trim())
+    errors.message = "Please tell us a little about what you need.";
   return errors;
 }
