@@ -1,13 +1,11 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { LockKeyhole } from "lucide-react";
 import { validate, type FormValues } from "@/lib/validation";
 
 const FLODESK_FORM_ID = "6ae077d675c737372cf4391c";
-const FLODESK_ROOT_CLASS = `ff-${FLODESK_FORM_ID}`;
-const FLODESK_ACTION = `https://form.flodesk.com/forms/${FLODESK_FORM_ID}/submit`;
-const FLODESK_CONFIG =
-  "eyJ0cmlnZ2VyIjp7Im1vZGUiOiJpbW1lZGlhdGVseSIsInZhbHVlIjowfSwib25TdWNjZXNzIjp7Im1vZGUiOiJyZWRpcmVjdCIsIm1lc3NhZ2UiOiIiLCJyZWRpcmVjdFVybCI6Imh0dHBzOi8vY29uc3VsdGF0aW9uLmFuYWZhc2hpb25ib3V0aXF1ZS5jb20vdGhhbmsteW91In0sImNvaSI6dHJ1ZSwic2hvd0ZvclJldHVyblZpc2l0b3JzIjp0cnVlLCJub3RpZmljYXRpb24iOnRydWUsImdkcHIiOnsiYWNjZXB0c01hcmtldGluZyI6ZmFsc2UsInByaXZhY3lQb2xpY3kiOnsiZW5hYmxlZCI6ZmFsc2UsIm1hbmRhdG9yeSI6ZmFsc2V9fSwidHJhY2tpbmdDb25maWciOnsibWV0YVBpeGVsSWQiOiIiLCJjb29raWVCYW5uZXJFbmFibGVkIjpmYWxzZSwiZ29vZ2xlQW5hbHl0aWNzSWQiOiIifX0=";
+const FLODESK_CONTAINER_ID = "flodesk-consultation-form";
 
 type FlodeskFunction = {
   (...args: unknown[]): void;
@@ -21,71 +19,205 @@ declare global {
   }
 }
 
-const fields: {
-  key: Exclude<keyof FormValues, "message">;
+const fieldSettings: {
+  key: keyof FormValues;
   label: string;
   placeholder: string;
-  type: string;
   autoComplete: string;
-  required: boolean;
+  inputMode?: "email" | "tel" | "url";
 }[] = [
   {
     key: "fullName",
     label: "Full Name",
     placeholder: "Your full name",
-    type: "text",
     autoComplete: "name",
-    required: true,
   },
   {
     key: "email",
     label: "Active Email",
     placeholder: "you@example.com",
-    type: "email",
     autoComplete: "email",
-    required: true,
+    inputMode: "email",
   },
   {
     key: "phone",
     label: "WhatsApp Number",
     placeholder: "Your number with country code",
-    type: "tel",
     autoComplete: "tel",
-    required: true,
+    inputMode: "tel",
   },
   {
     key: "business",
     label: "Business Name",
     placeholder: "Your business name",
-    type: "text",
     autoComplete: "organization",
-    required: true,
   },
   {
     key: "url",
     label: "Website or Facebook URL",
     placeholder: "https://",
-    type: "url",
     autoComplete: "url",
-    required: true,
+    inputMode: "url",
+  },
+  {
+    key: "message",
+    label: "Anything You Want to Say",
+    placeholder: "Tell us about your event, style, or budget…",
+    autoComplete: "off",
   },
 ];
-export default function CTAForm() {
-  const [values, setValues] = useState<FormValues>({
-    fullName: "",
-    email: "",
-    phone: "",
-    business: "",
-    url: "",
-    message: "",
+
+function loadFlodeskScripts() {
+  if (document.querySelector('script[data-flodesk-universal="module"]')) return;
+
+  const version = `?v=${Math.floor(Date.now() / 120_000) * 60}`;
+  const moduleScript = document.createElement("script");
+  moduleScript.async = true;
+  moduleScript.type = "module";
+  moduleScript.src = `https://assets.flodesk.com/universal.mjs${version}`;
+  moduleScript.dataset.flodeskUniversal = "module";
+  document.head.appendChild(moduleScript);
+
+  const legacyScript = document.createElement("script");
+  legacyScript.async = true;
+  legacyScript.noModule = true;
+  legacyScript.src = `https://assets.flodesk.com/universal.js${version}`;
+  legacyScript.dataset.flodeskUniversal = "legacy";
+  document.head.appendChild(legacyScript);
+}
+
+function getVisibleFlodeskInputs(container: HTMLElement) {
+  return Array.from(
+    container.querySelectorAll<HTMLInputElement>('input:not([type="hidden"])'),
+  ).filter((input) => input.getClientRects().length > 0);
+}
+
+function enhanceFlodeskForm(container: HTMLElement) {
+  const form = container.querySelector<HTMLFormElement>(
+    'form[data-ff-el="form"]',
+  );
+  const inputs = getVisibleFlodeskInputs(container);
+
+  if (!form || inputs.length !== fieldSettings.length) return null;
+  if (!form.querySelector('input[name="csrf"]')) return null;
+  if (form.dataset.consultationEnhanced === "true") return () => {};
+
+  form.dataset.consultationEnhanced = "true";
+  form.setAttribute("aria-label", "Free consultation booking");
+  form.noValidate = true;
+
+  const inputByKey = {} as Record<keyof FormValues, HTMLInputElement>;
+
+  inputs.forEach((input, index) => {
+    const settings = fieldSettings[index];
+    const group = input.closest<HTMLElement>(".fd-form-group");
+    const label = group?.querySelector<HTMLLabelElement>("label");
+
+    inputByKey[settings.key] = input;
+    input.dataset.consultationInput = settings.key;
+    input.placeholder = settings.placeholder;
+    input.setAttribute("autocomplete", settings.autoComplete);
+    input.required = true;
+    input.setAttribute("aria-required", "true");
+    if (settings.inputMode) input.inputMode = settings.inputMode;
+
+    if (group) group.dataset.consultationField = settings.key;
+    if (label) label.textContent = `${settings.label} *`;
+
+    const error = document.createElement("p");
+    error.id = `${input.id}-error`;
+    error.dataset.consultationError = settings.key;
+    error.setAttribute("role", "alert");
+    error.hidden = true;
+    group?.appendChild(error);
   });
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof FormValues, string>>
-  >({});
+
+  const button = form.querySelector<HTMLButtonElement>('[data-ff-el="submit"]');
+  if (button) button.textContent = "Book Free Consultation";
+
+  const showFieldError = (key: keyof FormValues, message?: string) => {
+    const input = inputByKey[key];
+    const error = form.querySelector<HTMLElement>(
+      `[data-consultation-error="${key}"]`,
+    );
+
+    input.setAttribute("aria-invalid", message ? "true" : "false");
+    if (message && error) {
+      error.textContent = message;
+      error.hidden = false;
+      input.setAttribute("aria-describedby", error.id);
+    } else if (error) {
+      error.textContent = "";
+      error.hidden = true;
+      input.removeAttribute("aria-describedby");
+    }
+  };
+
+  const showErrors = (errors: Partial<Record<keyof FormValues, string>>) => {
+    fieldSettings.forEach(({ key }) => showFieldError(key, errors[key]));
+  };
+
+  const readValues = (): FormValues => ({
+    fullName: inputByKey.fullName.value,
+    email: inputByKey.email.value,
+    phone: inputByKey.phone.value,
+    business: inputByKey.business.value,
+    url: inputByKey.url.value,
+    message: inputByKey.message.value,
+  });
+
+  const onSubmit = (event: SubmitEvent) => {
+    const errors = validate(readValues());
+    showErrors(errors);
+    const firstInvalid = fieldSettings.find(({ key }) => errors[key]);
+
+    if (firstInvalid) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      inputByKey[firstInvalid.key].focus();
+    }
+  };
+
+  const inputListeners = fieldSettings.map(({ key }) => {
+    const input = inputByKey[key];
+    const listener = () => showFieldError(key, validate(readValues())[key]);
+    input.addEventListener("input", listener);
+    return { input, listener };
+  });
+  form.addEventListener("submit", onSubmit, true);
+
+  return () => {
+    inputListeners.forEach(({ input, listener }) =>
+      input.removeEventListener("input", listener),
+    );
+    form.removeEventListener("submit", onSubmit, true);
+  };
+}
+
+export default function CTAForm() {
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
 
   useEffect(() => {
-    window.FlodeskObject = "fd";
+    const container = document.getElementById(FLODESK_CONTAINER_ID);
+    if (!container) return;
 
+    let active = true;
+    let detachValidation: (() => void) | null = null;
+    const tryEnhance = () => {
+      if (detachValidation) return;
+      const detach = enhanceFlodeskForm(container);
+      if (detach) {
+        detachValidation = detach;
+        if (active) setStatus("ready");
+      }
+    };
+
+    const observer = new MutationObserver(tryEnhance);
+    observer.observe(container, { childList: true, subtree: true });
+
+    window.FlodeskObject = "fd";
     if (!window.fd) {
       const fd: FlodeskFunction = (...args: unknown[]) => {
         fd.q = fd.q || [];
@@ -94,42 +226,29 @@ export default function CTAForm() {
       window.fd = fd;
     }
 
-    if (!document.querySelector('script[data-flodesk-universal="module"]')) {
-      const version = `?v=${Math.floor(Date.now() / 120_000) * 60}`;
-      const moduleScript = document.createElement("script");
-      moduleScript.async = true;
-      moduleScript.type = "module";
-      moduleScript.src = `https://assets.flodesk.com/universal.mjs${version}`;
-      moduleScript.dataset.flodeskUniversal = "module";
-      document.head.appendChild(moduleScript);
+    loadFlodeskScripts();
 
-      const legacyScript = document.createElement("script");
-      legacyScript.async = true;
-      legacyScript.noModule = true;
-      legacyScript.src = `https://assets.flodesk.com/universal.js${version}`;
-      legacyScript.dataset.flodeskUniversal = "legacy";
-      document.head.appendChild(legacyScript);
-    }
-
-    const root = document.querySelector<HTMLElement>(`.${FLODESK_ROOT_CLASS}`);
-    if (root && !root.dataset.flodeskInitialized) {
-      root.dataset.flodeskInitialized = "true";
-      window.fd("form:handle", {
+    if (!container.dataset.flodeskRequested) {
+      container.dataset.flodeskRequested = "true";
+      window.fd("form", {
         formId: FLODESK_FORM_ID,
-        rootEl: `.${FLODESK_ROOT_CLASS}`,
+        containerEl: `#${FLODESK_CONTAINER_ID}`,
       });
     }
+
+    tryEnhance();
+    const timeout = window.setTimeout(() => {
+      if (active && !detachValidation) setStatus("error");
+    }, 20_000);
+
+    return () => {
+      active = false;
+      observer.disconnect();
+      window.clearTimeout(timeout);
+      detachValidation?.();
+    };
   }, []);
 
-  function submit(event: React.FormEvent<HTMLFormElement>) {
-    const nextErrors = validate(values);
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length) {
-      event.preventDefault();
-      event.stopPropagation();
-      document.getElementById(Object.keys(nextErrors)[0])?.focus();
-    }
-  }
   return (
     <section id="consultation" className="scroll-mt-6 py-20 sm:py-28">
       <div className="section-wrap grid items-start gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
@@ -141,155 +260,36 @@ export default function CTAForm() {
             Customized strategy for your business
           </p>
         </div>
-        <div
-          className={`contents ${FLODESK_ROOT_CLASS}`}
-          data-ff-el="root"
-          data-ff-version="3"
-          data-ff-type="inline"
-          data-ff-name="inlineNoImage"
-          data-ff-stage="default"
-        >
+
+        <div className="rounded-3xl border border-maroon/10 bg-cream-card p-5 shadow-xl shadow-maroon/5 sm:p-9">
+          {status === "loading" && (
+            <p className="py-8 text-center text-sm text-ink/60" role="status">
+              Loading secure consultation form…
+            </p>
+          )}
+          {status === "error" && (
+            <p className="rounded-xl border border-maroon/20 p-4 text-sm text-maroon" role="alert">
+              The consultation form could not load. Please refresh the page and
+              try again.
+            </p>
+          )}
           <div
-            data-ff-el="config"
-            data-ff-config={FLODESK_CONFIG}
-            className="hidden"
+            id={FLODESK_CONTAINER_ID}
+            className={status === "ready" ? "block" : "invisible h-0 overflow-hidden"}
           />
-          <form
-            action={FLODESK_ACTION}
-            method="post"
-            onSubmitCapture={submit}
-            noValidate
-            data-ff-el="form"
-            aria-label="Free consultation booking"
-            className="rounded-3xl border border-maroon/10 bg-cream-card p-5 shadow-xl shadow-maroon/5 sm:p-9"
-          >
-            <div
-              className="grid gap-x-5 gap-y-6 sm:grid-cols-2"
-              data-ff-el="content"
-            >
-              {fields.map((field) => (
-                <div
-                  key={field.key}
-                  className={field.key === "url" ? "sm:col-span-2" : ""}
-                >
-                  <label
-                    htmlFor={field.key}
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    {field.label}{" "}
-                    <span className="font-normal text-ink/55">
-                      {field.required ? "*" : "(optional)"}
-                    </span>
-                  </label>
-                  <input
-                    id={field.key}
-                    name={
-                      field.key === "fullName"
-                        ? "firstName"
-                        : field.key === "phone"
-                          ? "fields.whatsappNumber"
-                          : field.key === "business"
-                            ? "fields.businessName"
-                            : field.key === "url"
-                              ? "fields.websieOrFacebookLink"
-                              : "email"
-                    }
-                    type={field.type}
-                    autoComplete={field.autoComplete}
-                    required={field.required}
-                    placeholder={field.placeholder}
-                    maxLength={255}
-                    value={values[field.key]}
-                    onChange={(e) => {
-                      setValues({ ...values, [field.key]: e.target.value });
-                      if (errors[field.key])
-                        setErrors({ ...errors, [field.key]: undefined });
-                    }}
-                    aria-invalid={!!errors[field.key]}
-                    aria-describedby={
-                      errors[field.key] ? `${field.key}-error` : undefined
-                    }
-                    className="form-input"
-                  />
-                  {errors[field.key] && (
-                    <p
-                      id={`${field.key}-error`}
-                      role="alert"
-                      className="mt-2 text-sm text-maroon"
-                    >
-                      {errors[field.key]}
-                    </p>
-                  )}
-                </div>
-              ))}
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="message"
-                  className="mb-2 block text-sm font-semibold"
-                >
-                  Anything You Want to Say{" "}
-                  <span className="font-normal text-ink/55">*</span>
-                </label>
-                <textarea
-                  id="message"
-                  name="fields.askAnythinkYouWantToSay"
-                  rows={4}
-                  maxLength={255}
-                  required
-                  placeholder="Tell us about your event, style, or budget…"
-                  value={values.message}
-                  onChange={(e) => {
-                    setValues({ ...values, message: e.target.value });
-                    if (errors.message)
-                      setErrors({ ...errors, message: undefined });
-                  }}
-                  aria-invalid={!!errors.message}
-                  aria-describedby={
-                    errors.message ? "message-error" : undefined
-                  }
-                  className="form-input resize-y"
-                />
-                {errors.message && (
-                  <p
-                    id="message-error"
-                    role="alert"
-                    className="mt-2 text-sm text-maroon"
-                  >
-                    {errors.message}
-                  </p>
-                )}
-              </div>
-            </div>
-            <input
-              type="text"
-              name="confirm_email_address"
-              maxLength={255}
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-              className="hidden"
-            />
-            <button
-              className="primary-button mt-6 w-full"
-              type="submit"
-              data-ff-el="submit"
-            >
-              Book Free Consultation
-            </button>
-            <p className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-ink/60">
-              <LockKeyhole className="h-3 w-3" aria-hidden="true" />
-              We respect your privacy. No spam.
-            </p>
-            <p className="mt-4 text-center text-xs leading-5 text-ink/60">
-              By submitting, you agree to receive consultation emails from
-              A&amp;A Fashion Boutique. You can unsubscribe at any time.
-            </p>
-            <div
-              className="mt-4 text-center text-sm text-maroon"
-              data-ff-el="error"
-              role="alert"
-            />
-          </form>
+
+          {status === "ready" && (
+            <>
+              <p className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-ink/60">
+                <LockKeyhole className="h-3 w-3" aria-hidden="true" />
+                We respect your privacy. No spam.
+              </p>
+              <p className="mt-4 text-center text-xs leading-5 text-ink/60">
+                By submitting, you agree to receive consultation emails from
+                A&amp;A Fashion Boutique. You can unsubscribe at any time.
+              </p>
+            </>
+          )}
         </div>
       </div>
     </section>

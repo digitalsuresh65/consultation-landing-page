@@ -35,6 +35,157 @@
     @apply w-full rounded-xl border border-maroon/20 bg-cream-card px-4 py-3.5 text-base text-ink outline-none transition focus:border-maroon focus:ring-2 focus:ring-maroon/10;
   }
 }
+
+/* Flodesk rotates its CSRF token and real/decoy field names on every load. */
+#flodesk-consultation-form [data-ff-el="root"],
+#flodesk-consultation-form [data-ff-el="root"] > div,
+#flodesk-consultation-form [data-ff-el="root"] > div > div,
+#flodesk-consultation-form form,
+#flodesk-consultation-form [data-ff-el="content"] {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#flodesk-consultation-form [data-ff-el="root"] > div > div {
+  min-height: 0 !important;
+}
+
+#flodesk-consultation-form [data-ff-el="fields"] {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1.5rem 1.25rem !important;
+}
+
+#flodesk-consultation-form [data-consultation-field] {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+#flodesk-consultation-form [data-consultation-field="url"],
+#flodesk-consultation-form [data-consultation-field="message"] {
+  grid-column: 1 / -1;
+}
+
+#flodesk-consultation-form [data-consultation-field] label {
+  position: static !important;
+  order: -1;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  color: theme("colors.ink") !important;
+  background: transparent !important;
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25rem !important;
+  opacity: 1 !important;
+}
+
+#flodesk-consultation-form [data-consultation-input] {
+  display: block !important;
+  width: 100% !important;
+  min-height: 3.25rem !important;
+  margin: 0 !important;
+  padding: 0.875rem 1rem !important;
+  border: 1px solid rgb(111 26 43 / 0.2) !important;
+  border-radius: 0.75rem !important;
+  outline: none !important;
+  color: theme("colors.ink") !important;
+  background: theme("colors.cream.card") !important;
+  box-shadow: none !important;
+  font-family: inherit !important;
+  font-size: 1rem !important;
+  line-height: 1.5rem !important;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease !important;
+}
+
+#flodesk-consultation-form [data-consultation-input]:focus {
+  border-color: theme("colors.maroon.DEFAULT") !important;
+  box-shadow: 0 0 0 2px rgb(111 26 43 / 0.1) !important;
+}
+
+#flodesk-consultation-form [data-consultation-input]::placeholder {
+  color: rgb(42 35 34 / 0.5) !important;
+  opacity: 1 !important;
+}
+
+#flodesk-consultation-form [data-consultation-error] {
+  margin: 0 !important;
+  color: theme("colors.maroon.DEFAULT") !important;
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+}
+
+#flodesk-consultation-form [data-consultation-error][hidden] {
+  display: none !important;
+}
+
+#flodesk-consultation-form [data-ff-el="footer"] {
+  margin: 1.5rem 0 0 !important;
+  padding: 0 !important;
+}
+
+#flodesk-consultation-form [data-ff-el="submit"] {
+  display: inline-flex !important;
+  width: 100% !important;
+  min-height: 3.5rem !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 1rem 2rem !important;
+  border: 0 !important;
+  border-radius: 9999px !important;
+  color: theme("colors.cream.card") !important;
+  background: theme("colors.maroon.DEFAULT") !important;
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25rem !important;
+  transition: background-color 150ms ease !important;
+}
+
+#flodesk-consultation-form [data-ff-el="submit"]:hover {
+  background: theme("colors.maroon.dark") !important;
+}
+
+#flodesk-consultation-form [data-ff-el="error"] {
+  margin: 1rem 0 0 !important;
+  color: theme("colors.maroon.DEFAULT") !important;
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  text-align: center !important;
+}
+
+#flodesk-consultation-form [data-ff-el="success"],
+#flodesk-consultation-form [class*="__title"],
+#flodesk-consultation-form [class*="__subtitle"] {
+  display: none !important;
+}
+
+@media (max-width: 639px) {
+  #flodesk-consultation-form [data-ff-el="fields"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #flodesk-consultation-form [data-consultation-field="url"],
+  #flodesk-consultation-form [data-consultation-field="message"] {
+    grid-column: auto;
+  }
+}
 .hero-glow {
   background: radial-gradient(
     ellipse at 50% 36%,

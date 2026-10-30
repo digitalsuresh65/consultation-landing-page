@@ -26,9 +26,9 @@ Blank or invalid configuration renders clearly labeled dashed placeholders. No f
 
 ## Flodesk submission
 
-The consultation form submits to Flodesk form `6ae077d675c737372cf4391c` using Flodesk's official universal form handler. The existing page design is retained while the input names map to the Flodesk subscriber and custom fields from the supplied embed. Successful submissions use the redirect configured in Flodesk (`/thank-you`), which displays the production receipt message. A hidden `confirm_email_address` honeypot is included for bot filtering.
+The consultation form renders Flodesk form `6ae077d675c737372cf4391c` through Flodesk's official universal form loader, then applies the site's visual styling and accessible validation to the live fields. This is important because Flodesk now rotates the CSRF token and the real/decoy field names on every load; hard-coded field names can appear to submit successfully while Flodesk discards the request. Successful submissions use the redirect configured in Flodesk (`/thank-you`), which displays the production receipt message.
 
-The browser validates full name, email, WhatsApp number, business name, website/Facebook URL, and message before submission. Flodesk owns subscriber creation, segment assignment, workflow enrollment, delivery, duplicate handling, and any confirmation behavior configured for this form. If those settings change, export the updated Flodesk embed and keep its form ID, field keys, and encoded configuration in sync with `components/CTAForm.tsx`.
+The browser validates full name, email, WhatsApp number, business name, website/Facebook URL, and message before submission. Flodesk owns subscriber creation, segment assignment, workflow enrollment, delivery, duplicate handling, and any confirmation behavior configured for this form. Keep the six fields in the same order in the Flodesk form; if its structure changes, update `fieldSettings` in `components/CTAForm.tsx` to match.
 
 ## Vercel deployment
 
@@ -43,6 +43,6 @@ Semantic headings and lists, visible keyboard focus, field labels, inline error 
 
 ## Browser QA
 
-`scripts/qa.cjs` checks both pages at 320, 375, 390, and 430 pixels, required-field and format errors, error focus, the exact Flodesk endpoint and field mapping, the thank-you receipt, and empty integration placeholders. Run a local server on port 3000 and execute with an installed Playwright package (`PLAYWRIGHT_MODULE=/absolute/path/to/playwright node scripts/qa.cjs`). It uses an installed Google Chrome browser; Playwright is a QA-only dependency and is not shipped with the site. The QA script intentionally never submits valid contact data, so it cannot create a real Flodesk subscriber or trigger the live workflow.
+`scripts/qa.cjs` checks both pages at 320, 375, 390, and 430 pixels, required-field and format errors, error focus, the exact Flodesk endpoint, the rotating CSRF token, randomized decoy fields, all six submitted values, the thank-you receipt, and empty integration placeholders. Run a local server on port 3000 and execute with an installed Playwright package (`PLAYWRIGHT_MODULE=/absolute/path/to/playwright node scripts/qa.cjs`). It uses an installed Google Chrome browser; Playwright is a QA-only dependency and is not shipped with the site. The QA script intercepts the valid submission before it reaches Flodesk, so it cannot create a subscriber or trigger the live workflow.
 
 The production dependency audit is clean. Tailwind 3's development dependency tree currently reports upstream parser/glob advisories; avoid processing untrusted CSS or glob patterns. These packages are build tools and are not part of the deployed browser runtime.
