@@ -76,6 +76,45 @@ const assert = require("node:assert/strict");
     .waitFor();
 
   const form = page.locator('#flodesk-consultation-form form[data-ff-el="form"]');
+  const root = page.locator(
+    '#flodesk-consultation-form [data-ff-el="root"].ff-6ae077d675c737372cf4391c',
+  );
+  assert.equal(await root.getAttribute("data-ff-version"), "3");
+  assert.equal(await root.getAttribute("data-ff-type"), "inline");
+  assert.equal(await root.getAttribute("data-ff-name"), "inlineNoImage");
+  assert.equal(await root.getAttribute("data-ff-stage"), "default");
+
+  const encodedConfig = await root
+    .locator('[data-ff-el="config"]')
+    .getAttribute("data-ff-config");
+  assert.ok(encodedConfig, "The supplied Flodesk config is missing");
+  const flodeskConfig = JSON.parse(
+    Buffer.from(encodedConfig, "base64").toString("utf8"),
+  );
+  assert.equal(flodeskConfig.coi, false);
+  assert.equal(flodeskConfig.notification, false);
+  assert.deepEqual(flodeskConfig.onSuccess, {
+    mode: "redirect",
+    redirectUrl: "https://consultation.anafashionboutique.com/thank-you",
+  });
+  assert.equal(
+    await page.locator(
+      'link[rel="preload"][href="https://assets.flodesk.com/flodesk-sans.css"]',
+    ).count(),
+    1,
+  );
+  assert.equal(
+    await page.locator(
+      'link[rel="stylesheet"][href="https://assets.flodesk.com/flodesk-sans.css"]',
+    ).count(),
+    1,
+  );
+  assert.deepEqual(
+    await page.locator("[data-consultation-input]").evaluateAll((inputs) =>
+      inputs.map((input) => input.getAttribute("data-consultation-input")),
+    ),
+    ["fullName", "email", "phone", "business", "url", "message"],
+  );
   assert.equal(
     await form.getAttribute("action"),
     "https://form.flodesk.com/forms/6ae077d675c737372cf4391c/submit",

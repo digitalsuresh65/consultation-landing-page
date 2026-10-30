@@ -26,7 +26,7 @@ Blank or invalid configuration renders clearly labeled dashed placeholders. No f
 
 ## Flodesk submission
 
-The consultation form renders Flodesk form `6ae077d675c737372cf4391c` through Flodesk's official universal form loader, then applies the site's visual styling and accessible validation to the live fields. This is important because Flodesk now rotates the CSRF token and the real/decoy field names on every load; hard-coded field names can appear to submit successfully while Flodesk discards the request. Successful submissions use the redirect configured in Flodesk (`/thank-you`), which displays the production receipt message.
+The consultation form renders Flodesk form `6ae077d675c737372cf4391c` through Flodesk's official universal form loader, including the supplied Flodesk Sans stylesheet, inline form metadata, six fields, and production thank-you redirect. The site's visual styling and accessible validation are then applied to the live fields so the existing layout remains unchanged. The pasted static snapshot is deliberately not submitted verbatim because Flodesk now rotates the CSRF token and the real/decoy field names on every load; hard-coded field names can appear to submit successfully while Flodesk discards the request.
 
 The browser validates full name, email, WhatsApp number, business name, website/Facebook URL, and message before submission. Flodesk owns subscriber creation, segment assignment, workflow enrollment, delivery, duplicate handling, and any confirmation behavior configured for this form. Keep the six fields in the same order in the Flodesk form; if its structure changes, update `fieldSettings` in `components/CTAForm.tsx` to match.
 

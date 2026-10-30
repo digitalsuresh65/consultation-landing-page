@@ -5,6 +5,7 @@ import { LockKeyhole } from "lucide-react";
 import { validate, type FormValues } from "@/lib/validation";
 
 const FLODESK_FORM_ID = "6ae077d675c737372cf4391c";
+const FLODESK_ROOT_CLASS = `ff-${FLODESK_FORM_ID}`;
 const FLODESK_CONTAINER_ID = "flodesk-consultation-form";
 
 type FlodeskFunction = {
@@ -93,12 +94,20 @@ function getVisibleFlodeskInputs(container: HTMLElement) {
 }
 
 function enhanceFlodeskForm(container: HTMLElement) {
-  const form = container.querySelector<HTMLFormElement>(
+  const root = container.querySelector<HTMLElement>(
+    `[data-ff-el="root"].${FLODESK_ROOT_CLASS}`,
+  );
+  const config = root?.querySelector<HTMLElement>(
+    '[data-ff-el="config"][data-ff-config]',
+  );
+  const form = root?.querySelector<HTMLFormElement>(
     'form[data-ff-el="form"]',
   );
-  const inputs = getVisibleFlodeskInputs(container);
+  const inputs = root ? getVisibleFlodeskInputs(root) : [];
 
-  if (!form || inputs.length !== fieldSettings.length) return null;
+  if (!root || !config || !form || inputs.length !== fieldSettings.length) {
+    return null;
+  }
   if (!form.querySelector('input[name="csrf"]')) return null;
   if (form.dataset.consultationEnhanced === "true") return () => {};
 
