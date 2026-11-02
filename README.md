@@ -14,15 +14,9 @@ npm run dev
 
 Open http://localhost:3000. Run `npm run typecheck` and `npm run build` to validate. `npm start` serves the production build.
 
-## Vimeo and WhatsApp
+## YouTube and WhatsApp
 
-Add these to `.env.local`, or to the project's Vercel environment variables:
-
-- `NEXT_PUBLIC_VIMEO_URL`: the HTTPS Vimeo video URL, including an unlisted privacy hash if supplied by Vimeo. Supports `vimeo.com/<id>`, `vimeo.com/<id>/<hash>`, and `player.vimeo.com/video/<id>?h=<hash>`. Enable embedding in Vimeo privacy settings. Autoplay is disabled.
-- `NEXT_PUBLIC_WHATSAPP_NUMBER`: your real international WhatsApp number, country code first, digits only (an initial `+` is also accepted). No spaces or punctuation. The link includes the requested pre-filled message.
-- `NEXT_PUBLIC_SITE_URL`: the full production origin, used for absolute Open Graph metadata. Locally it defaults to http://localhost:3000.
-
-Blank or invalid configuration renders clearly labeled dashed placeholders. No fake number or video is included. Restart development or rebuild/redeploy after changing environment variables. Public-prefixed variables are public: do not put secrets in them.
+The thank-you page embeds YouTube video `QhzArGq7zfM` using YouTube's privacy-enhanced domain and links its WhatsApp button to local number `9841591833` (with Nepal's `+977` prefix in the international link) and the requested pre-filled message. `NEXT_PUBLIC_SITE_URL` remains the full production origin used for absolute Open Graph metadata; locally it defaults to http://localhost:3000.
 
 ## Flodesk submission
 
@@ -34,8 +28,8 @@ The browser validates full name, email, WhatsApp number, business name, website/
 
 1. Push the project to your Git provider and import it in Vercel.
 2. Use the auto-detected Next.js framework preset; build command `npm run build`. No custom output directory is needed.
-3. Add the variables above for the appropriate environments; set the production site origin.
-4. Deploy. When the video URL or number becomes available, add it and redeploy.
+3. Set `NEXT_PUBLIC_SITE_URL` for the appropriate environments.
+4. Deploy.
 
 ## Accessibility and behavior
 
@@ -43,6 +37,6 @@ Semantic headings and lists, visible keyboard focus, field labels, inline error 
 
 ## Browser QA
 
-`scripts/qa.cjs` checks both pages at 320, 375, 390, and 430 pixels, required-field and format errors, error focus, the exact Flodesk endpoint, the rotating CSRF token, randomized decoy fields, all six submitted values, the thank-you receipt, and empty integration placeholders. Run a local server on port 3000 and execute with an installed Playwright package (`PLAYWRIGHT_MODULE=/absolute/path/to/playwright node scripts/qa.cjs`). It uses an installed Google Chrome browser; Playwright is a QA-only dependency and is not shipped with the site. The QA script intercepts the valid submission before it reaches Flodesk, so it cannot create a subscriber or trigger the live workflow.
+`scripts/qa.cjs` checks both pages at 320, 375, 390, and 430 pixels, required-field and format errors, error focus, the exact Flodesk endpoint, the rotating CSRF token, randomized decoy fields, all six submitted values, the thank-you receipt, and the YouTube and WhatsApp integrations. Run a local server on port 3000 and execute with an installed Playwright package (`PLAYWRIGHT_MODULE=/absolute/path/to/playwright node scripts/qa.cjs`). It uses an installed Google Chrome browser; Playwright is a QA-only dependency and is not shipped with the site. The QA script intercepts the valid submission before it reaches Flodesk, so it cannot create a subscriber or trigger the live workflow.
 
 The production dependency audit is clean. Tailwind 3's development dependency tree currently reports upstream parser/glob advisories; avoid processing untrusted CSS or glob patterns. These packages are build tools and are not part of the deployed browser runtime.

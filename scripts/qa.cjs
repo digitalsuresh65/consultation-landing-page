@@ -183,17 +183,20 @@ const assert = require("node:assert/strict");
   await page
     .getByText("Your consultation request has been received.", { exact: true })
     .waitFor();
-  await page
-    .getByText("Video will appear here once a Vimeo URL is added")
-    .waitFor();
-  assert.equal(await page.locator("iframe").count(), 0);
+  const videoFrame = page.locator('iframe[title="A&A Fashion Boutique consultation video"]');
+  await videoFrame.waitFor();
+  assert.match(
+    await videoFrame.getAttribute("src"),
+    /^https:\/\/www\.youtube-nocookie\.com\/embed\/QhzArGq7zfM\?rel=0$/,
+  );
   const whatsappLinks = page.locator('a[href*="wa.me"]');
-  assert.ok((await whatsappLinks.count()) <= 1);
-  if ((await whatsappLinks.count()) === 1) {
-    assert.match(await whatsappLinks.first().getAttribute("href"), /^https:\/\/wa\.me\/\d+/);
-  }
+  assert.equal(await whatsappLinks.count(), 1);
+  assert.match(
+    await whatsappLinks.first().getAttribute("href"),
+    /^https:\/\/wa\.me\/9779841591833\?/,
+  );
   console.log(
-    "PASS validation, focus, tokenized Flodesk payload, receipt, and integration placeholders",
+    "PASS validation, focus, tokenized Flodesk payload, receipt, YouTube, and WhatsApp",
   );
   await page.goto("http://127.0.0.1:3000");
   await page.setViewportSize({ width: 1440, height: 1100 });
