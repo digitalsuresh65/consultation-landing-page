@@ -294,7 +294,7 @@ export default function CTAForm() {
                 We respect your privacy. No spam.
               </p>
               <p className="mt-4 text-center text-xs leading-5 text-ink/60">
-                By submitting, you agree to receive consultation emails from
+                By submitting, you agree to receive the planner and helpful outfit emails from
                 A&amp;A Fashion Boutique. You can unsubscribe at any time.
               </p>
             </>

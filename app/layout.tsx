@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
+import MetaPixel from "@/components/MetaPixel";
 import "./globals.css";
 const display = Cormorant_Garamond({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${display.variable} ${body.variable} font-body`}>
+        <MetaPixel />
         {children}
       </body>
     </html>

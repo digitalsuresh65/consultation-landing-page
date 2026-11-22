@@ -16,7 +16,7 @@ Open http://localhost:3000. Run `npm run typecheck` and `npm run build` to valid
 
 ## YouTube and WhatsApp
 
-The thank-you page embeds YouTube video `QhzArGq7zfM` using YouTube's privacy-enhanced domain and links its WhatsApp button to local number `9841591833` (with Nepal's `+977` prefix in the international link) and the requested pre-filled message. `NEXT_PUBLIC_SITE_URL` remains the full production origin used for absolute Open Graph metadata; locally it defaults to http://localhost:3000.
+The thank-you page embeds YouTube video `QhzArGq7zfM` using YouTube's privacy-enhanced domain and links its WhatsApp button to +977 9851074355 and the requested pre-filled message. `NEXT_PUBLIC_SITE_URL` remains the full production origin used for absolute Open Graph metadata; locally it defaults to http://localhost:3000.
 
 ## Flodesk submission
 

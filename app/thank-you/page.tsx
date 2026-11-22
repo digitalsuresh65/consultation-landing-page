@@ -4,7 +4,7 @@ import { MessageCircle } from "lucide-react";
 import { whatsappLink, youtubeEmbed } from "@/lib/integrations";
 
 const video = youtubeEmbed("https://youtu.be/QhzArGq7zfM");
-const whatsapp = whatsappLink("9779841591833");
+const whatsapp = whatsappLink("9779851074355");
 
 export default function ThankYou() {
   return (
