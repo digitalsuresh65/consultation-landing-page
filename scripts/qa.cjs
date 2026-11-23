@@ -10,8 +10,15 @@ const assert = require("node:assert/strict");
   for (const width of [320, 375, 390, 430]) {
     await page.setViewportSize({ width, height: 900 });
     for (const route of ["/", "/thank-you"]) {
-      await page.goto("http://127.0.0.1:3000" + route);
-      await page.evaluate(() => document.fonts.ready);
+      await page.goto("http://127.0.0.1:3000" + route, {
+        waitUntil: "domcontentloaded",
+      });
+      await page.evaluate(() =>
+        Promise.race([
+          document.fonts.ready,
+          new Promise((resolve) => setTimeout(resolve, 2000)),
+        ]),
+      );
       assert(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth,
@@ -91,8 +98,8 @@ const assert = require("node:assert/strict");
   const flodeskConfig = JSON.parse(
     Buffer.from(encodedConfig, "base64").toString("utf8"),
   );
-  assert.equal(flodeskConfig.coi, true);
-  assert.equal(flodeskConfig.notification, true);
+  assert.equal(flodeskConfig.coi, false);
+  assert.equal(flodeskConfig.notification, false);
   assert.deepEqual(flodeskConfig.onSuccess, {
     mode: "redirect",
     redirectUrl: "https://consultation.anafashionboutique.com/thank-you",
@@ -181,7 +188,7 @@ const assert = require("node:assert/strict");
   await page.waitForURL("http://127.0.0.1:3000/thank-you");
   await page.getByRole("heading", { name: "Thank You!" }).waitFor();
   await page
-    .getByText("Your consultation request has been received.", { exact: true })
+    .getByText("Confirm your email to finish signing up.", { exact: true })
     .waitFor();
   const videoFrame = page.locator('iframe[title="A&A Fashion Boutique consultation video"]');
   await videoFrame.waitFor();

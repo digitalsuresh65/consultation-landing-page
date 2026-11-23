@@ -3,11 +3,11 @@ export default function ReceiptConfirmation() {
   return (
     <>
       <p className="mt-6 text-xl">
-        Your consultation request has been received.
+        Confirm your email to finish signing up.
       </p>
       <p className="mx-auto mt-3 max-w-xl text-base leading-7 text-ink/70">
-        Our team will reach out to you shortly to plan your design, fitting, and
-        price — just like we promised.
+        Click the confirmation link Flodesk sent to your inbox. Your subscription
+        and the connected email automation can continue after you confirm.
       </p>
     </>
   );
