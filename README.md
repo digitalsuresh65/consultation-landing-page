@@ -20,7 +20,7 @@ The thank-you page embeds YouTube video `QhzArGq7zfM` using YouTube's privacy-en
 
 ## Flodesk submission
 
-The consultation form renders Flodesk form `6ae077d675c737372cf4391c` through Flodesk's official universal form loader, including the supplied Flodesk Sans stylesheet, inline form metadata, six fields, and production thank-you redirect. The site's visual styling and accessible validation are then applied to the live fields so the existing layout remains unchanged. The pasted static snapshot is deliberately not submitted verbatim because Flodesk now rotates the CSRF token and the real/decoy field names on every load; hard-coded field names can appear to submit successfully while Flodesk discards the request.
+The consultation form renders the supplied Flodesk form `6b0410517ae5546b44e75d91` through Flodesk's official universal form loader. Flodesk handles subscriber creation, segment assignment, and enrollment in the workflow configured for that form. The site's visual styling and accessible validation are applied to the live fields so the existing layout remains unchanged. The static embed snapshot is not submitted verbatim because Flodesk rotates the CSRF token and real/decoy field names on each load; hard-coded field names can appear to submit successfully while Flodesk discards the request.
 
 The browser validates full name, email, WhatsApp number, business name, website/Facebook URL, and message before submission. Flodesk owns subscriber creation, segment assignment, workflow enrollment, delivery, duplicate handling, and any confirmation behavior configured for this form. Keep the six fields in the same order in the Flodesk form; if its structure changes, update `fieldSettings` in `components/CTAForm.tsx` to match.
 

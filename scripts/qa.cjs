@@ -25,7 +25,7 @@ const assert = require("node:assert/strict");
 
   let submittedPayload;
   await page.route(
-    "https://form.flodesk.com/forms/6ae077d675c737372cf4391c/submit",
+    "https://form.flodesk.com/forms/6b0410517ae5546b44e75d91/submit",
     async (route) => {
       submittedPayload = JSON.parse(route.request().postData());
       await route.fulfill({
@@ -77,7 +77,7 @@ const assert = require("node:assert/strict");
 
   const form = page.locator('#flodesk-consultation-form form[data-ff-el="form"]');
   const root = page.locator(
-    '#flodesk-consultation-form [data-ff-el="root"].ff-6ae077d675c737372cf4391c',
+    '#flodesk-consultation-form [data-ff-el="root"].ff-6b0410517ae5546b44e75d91',
   );
   assert.equal(await root.getAttribute("data-ff-version"), "3");
   assert.equal(await root.getAttribute("data-ff-type"), "inline");
@@ -91,8 +91,8 @@ const assert = require("node:assert/strict");
   const flodeskConfig = JSON.parse(
     Buffer.from(encodedConfig, "base64").toString("utf8"),
   );
-  assert.equal(flodeskConfig.coi, false);
-  assert.equal(flodeskConfig.notification, false);
+  assert.equal(flodeskConfig.coi, true);
+  assert.equal(flodeskConfig.notification, true);
   assert.deepEqual(flodeskConfig.onSuccess, {
     mode: "redirect",
     redirectUrl: "https://consultation.anafashionboutique.com/thank-you",
@@ -117,7 +117,7 @@ const assert = require("node:assert/strict");
   );
   assert.equal(
     await form.getAttribute("action"),
-    "https://form.flodesk.com/forms/6ae077d675c737372cf4391c/submit",
+    "https://form.flodesk.com/forms/6b0410517ae5546b44e75d91/submit",
   );
   assert.equal(await form.getAttribute("method"), "post");
   assert.ok(await form.locator('input[name="csrf"]').inputValue());
@@ -193,7 +193,7 @@ const assert = require("node:assert/strict");
   assert.equal(await whatsappLinks.count(), 1);
   assert.match(
     await whatsappLinks.first().getAttribute("href"),
-    /^https:\/\/wa\.me\/9779841591833\?/,
+    /^https:\/\/wa\.me\/9779851074355\?/,
   );
   console.log(
     "PASS validation, focus, tokenized Flodesk payload, receipt, YouTube, and WhatsApp",
