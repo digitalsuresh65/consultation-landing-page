@@ -194,7 +194,7 @@ const assert = require("node:assert/strict");
     .getByRole("heading", { name: "Watch This Video", exact: true })
     .waitFor();
   await page
-    .getByRole("heading", { name: "Connect With Me on WhatsApp", exact: true })
+    .getByRole("heading", { name: "Connect With Us on WhatsApp", exact: true })
     .waitFor();
   const videoFrame = page.locator('iframe[title="A&A Fashion Boutique consultation video"]');
   await videoFrame.waitFor();
