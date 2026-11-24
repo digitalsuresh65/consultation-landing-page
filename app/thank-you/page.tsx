@@ -56,7 +56,7 @@ export default function ThankYou() {
           </h2>
           <p className="mx-auto mt-3 max-w-[600px] text-sm leading-[1.65] text-[#42634c] sm:text-base">
             Have a question about your consultation or want to discuss your
-            business goals? Send me a message directly on WhatsApp.
+            outfit? Send me a message directly on WhatsApp.
           </p>
           <a
             className="mt-4 inline-flex min-h-14 items-center justify-center gap-2 rounded-xl bg-[#20853b] px-4 py-3 text-sm font-bold text-white shadow-[0_6px_16px_rgba(19,97,43,0.2)] transition hover:bg-[#176b30] sm:min-h-[72px] sm:gap-3 sm:px-6 sm:py-4 sm:text-lg"

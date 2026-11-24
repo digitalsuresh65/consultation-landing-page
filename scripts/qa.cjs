@@ -196,6 +196,9 @@ const assert = require("node:assert/strict");
   await page
     .getByRole("heading", { name: "Connect With Us on WhatsApp", exact: true })
     .waitFor();
+  await page
+    .getByText("Have a question about your consultation or want to discuss your outfit? Send me a message directly on WhatsApp.", { exact: true })
+    .waitFor();
   const videoPoster = page.locator(
     'button[aria-label="Play A&A Fashion Boutique consultation video"] img',
   );
