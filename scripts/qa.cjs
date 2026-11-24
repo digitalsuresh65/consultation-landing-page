@@ -188,13 +188,19 @@ const assert = require("node:assert/strict");
   await page.waitForURL("http://127.0.0.1:3000/thank-you");
   await page.getByRole("heading", { name: "Thank You!" }).waitFor();
   await page
-    .getByText("Confirm your email to finish signing up.", { exact: true })
+    .getByText("Your Consultation Request Has Been Received.", { exact: true })
+    .waitFor();
+  await page
+    .getByRole("heading", { name: "Watch This Video", exact: true })
+    .waitFor();
+  await page
+    .getByRole("heading", { name: "Connect With Me on WhatsApp", exact: true })
     .waitFor();
   const videoFrame = page.locator('iframe[title="A&A Fashion Boutique consultation video"]');
   await videoFrame.waitFor();
   assert.match(
     await videoFrame.getAttribute("src"),
-    /^https:\/\/www\.youtube-nocookie\.com\/embed\/QhzArGq7zfM\?rel=0$/,
+    /^https:\/\/www\.youtube-nocookie\.com\/embed\/N2i5ivVb7Tw\?rel=0$/,
   );
   const whatsappLinks = page.locator('a[href*="wa.me"]');
   assert.equal(await whatsappLinks.count(), 1);
