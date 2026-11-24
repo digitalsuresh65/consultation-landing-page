@@ -196,11 +196,23 @@ const assert = require("node:assert/strict");
   await page
     .getByRole("heading", { name: "Connect With Us on WhatsApp", exact: true })
     .waitFor();
+  const videoPoster = page.locator(
+    'button[aria-label="Play A&A Fashion Boutique consultation video"] img',
+  );
+  assert.match(
+    await videoPoster.getAttribute("src"),
+    /N2i5ivVb7Tw\/maxresdefault\.jpg$/,
+  );
+  await page
+    .getByRole("button", {
+      name: "Play A&A Fashion Boutique consultation video",
+    })
+    .click();
   const videoFrame = page.locator('iframe[title="A&A Fashion Boutique consultation video"]');
   await videoFrame.waitFor();
   assert.match(
     await videoFrame.getAttribute("src"),
-    /^https:\/\/www\.youtube-nocookie\.com\/embed\/N2i5ivVb7Tw\?rel=0$/,
+    /^https:\/\/www\.youtube-nocookie\.com\/embed\/N2i5ivVb7Tw\?rel=0&vq=hd1080&autoplay=1$/,
   );
   const whatsappLinks = page.locator('a[href*="wa.me"]');
   assert.equal(await whatsappLinks.count(), 1);

@@ -1,4 +1,5 @@
 import ReceiptConfirmation from "@/components/ReceiptConfirmation";
+import VideoEmbed from "@/components/VideoEmbed";
 import { Check, MessageCircle } from "lucide-react";
 import { whatsappLink, youtubeEmbed } from "@/lib/integrations";
 
@@ -34,15 +35,13 @@ export default function ThankYou() {
           prepare for your consultation.
         </p>
 
-        <div className="mt-6 overflow-hidden rounded-2xl border-2 border-[#3b3938] shadow-[0_12px_28px_rgba(0,0,0,0.18)]">
-          <iframe
-            src={video ?? undefined}
-            title="A&A Fashion Boutique consultation video"
-            className="aspect-video w-full border-0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-          />
+        <div className="relative mt-6 aspect-video overflow-hidden rounded-2xl border-2 border-[#3b3938] shadow-[0_12px_28px_rgba(0,0,0,0.18)]">
+          {video && (
+            <VideoEmbed
+              embedUrl={video}
+              thumbnailUrl="https://img.youtube.com/vi/N2i5ivVb7Tw/maxresdefault.jpg"
+            />
+          )}
         </div>
 
         <section className="mt-6 rounded-2xl border-2 border-[#a9e6bb] bg-[#effcf3] px-4 py-7 sm:px-8 sm:py-7">

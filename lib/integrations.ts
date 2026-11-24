@@ -22,6 +22,7 @@ export function youtubeEmbed(value: string | undefined): string | null {
     if (!id || !/^[a-zA-Z0-9_-]{11}$/.test(id)) return null;
     const embed = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
     embed.searchParams.set("rel", "0");
+    embed.searchParams.set("vq", "hd1080");
     return embed.toString();
   } catch {
     return null;
