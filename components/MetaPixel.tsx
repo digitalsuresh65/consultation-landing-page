@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Script from "next/script";
 
-const PIXEL_ID = "1139078738574158";
+const PIXEL_ID = "1147553914640535";
 
 export default function MetaPixel() {
   const pathname = usePathname();
